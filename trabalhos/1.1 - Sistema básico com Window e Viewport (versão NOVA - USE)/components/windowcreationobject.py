@@ -15,11 +15,21 @@ class windowCreationObject(Toplevel):
         _color: Combobox
             Objeto Combobox para escolha de cor ('black','red', 'yellow', 'blue', 'green', 'gray', 'orange').
 
+        _scrollbar: Scrollbar
+            Objeto Srollbar utilizado para rolagem das entries.
+
+        _canvas_entries: Canvas
+            Objeto Canvas que contem o Frame entries, necessario para rolagem.
+
         _entrys: Frame
             Objeto Frame para ser posicionados as entradas dos pontos. 
 
+
     Métodos
     -------
+        new_entry_point(list: points_list) -> None:
+            Função que gera entries para recebimento de pontos e inse no frame entries.
+
         createPoint(Canvas: window) -> None:
             Monta a janela para criar um ponto.
 
@@ -34,177 +44,96 @@ class windowCreationObject(Toplevel):
 
         #Cria label com texto 'Cor:'.
         self.labelCor = Label(self, text='Cor:')
-        self.labelCor.pack(pady=(10,5))
+        self.labelCor.grid(column=0, row=0, columnspan=2, pady=(10,5))
 
         #Cria boxlist para escolha da cor do objeto a ser desenhado.
         self.color = ttk.Combobox(self, state= "readonly")
         self.color['values'] = ('black','red', 'yellow', 'blue', 'green', 'gray', 'orange')
         self.color.current(0)
-        self.color.pack(pady=(0,10), padx=20)
+        self.color.grid(column=0, row=1, columnspan=2, pady=(0,10), padx=20)
 
-        #Cria frame para posicionar as entrys.
-        self.entrys = Frame(self)
-        self.entrys.pack(pady=(10,10))
+        #Cria o scrollbar vertical.
+        self.scrollbar = Scrollbar(self,orient=VERTICAL)
+        self.scrollbar.grid(column=1, row=2, sticky="ns")
+
+        #Canvas para receber o frame entries, necessario para rolagem.
+        self.canvas_entries = Canvas(self,yscrollcommand=self.scrollbar.set, width=150, height=190)
+        self.canvas_entries.grid(column=0, row=2)
+
+        #Cria Frame para posicionar as entrys.
+        self.entries = Frame(self.canvas_entries, width=150)
+        
+        #Configura rolagem.
+        self.scrollbar.config(command=self.canvas_entries.yview)
+        self.canvas_entries.create_window(0,0, window=self.entries, anchor='n')
+        self.canvas_entries.configure(scrollregion=self.canvas_entries.bbox("all"))
+
+    def new_entry_point(self, points_list):
+            n_points = len(points_list)
+            point_n = n_points + 1
+
+            #Cria label com texto 'Point-N:'.
+            labelPoint_1 = Label(self.entries, text=f'Point-{point_n}:')
+            labelPoint_1.grid(row=n_points*2, column=0, pady=5, columnspan=4)
+            
+            #Cria label com texto 'X:'.
+            labelX = Label(self.entries, text='X:')
+            labelX.grid(row=n_points*2 + 1, column=0, pady=5, padx=2)
+            #Cria entry para receber 'x'.
+            x = Entry(self.entries, width=5)
+            x.grid(row=n_points*2 + 1, column=1, padx=2)
+
+            #Cria label com texto 'Y:'.
+            labelY = Label(self.entries, text='Y:')
+            labelY.grid(row=n_points*2 + 1, column=2, pady=5, padx=2)
+            #Cria entry para receber 'y'.
+            y = Entry(self.entries, width=5)
+            y.grid(row=n_points*2 + 1, column=3, padx=2)
+
+            #Adiciona entries como um ponto na lista de pontos
+            points_list.append((x,y))
+            
+            #Redimensiona região de rolagem.
+            scrollregion = self.canvas_entries.bbox("all")
+            self.canvas_entries.configure(scrollregion=(scrollregion[0],scrollregion[1],scrollregion[2], scrollregion[3]+70))
+
 
     def createPoint(self, window):
-        #Cria label com texto 'Point:'.
-        labelPoint = Label(self.entrys, text='Point:')
-        labelPoint.grid(row=0, column=0, pady=5, columnspan=4)
-        
-        #Cria label com texto 'X:'.
-        labelX = Label(self.entrys, text='X:') 
-        labelX.grid(row=1, column=0, pady=5, padx=2)
-        #Cria entry para receber 'x'
-        x = Entry(self.entrys, width=5)
-        x.grid(row=1, column=1, padx=2)
+        points = []
 
-        #Cria label com texto 'Y:'.
-        labelY = Label(self.entrys, text='Y:')
-        labelY.grid(row=1, column=2, pady=5, padx=2)
-
-        #Cria entry para receber 'y'.
-        y = Entry(self.entrys, width=5)
-        y.grid(row=1, column=3, padx=2)
-
-        #Lista com o ponto a ser criado.
-        point = [(x,y)]
+        self.new_entry_point(points)
 
         #Cria o botão 'OK' para desenhar o ponto.
-        btn = Button(self, text='OK', width=3, command=lambda: window.create_object('point', point, self.color))
-        btn.pack(pady=(10,10))
+        btn = Button(self, text='OK', width=3, command=lambda: window.drawn_point(points[0], self.color.get()))
+        btn.grid(column=0, row=3, columnspan=2, pady=(10,10))
 
     def createLine(self, window):
-        ########## Point-1 ##########
-        #Cria label com texto 'Point-1:'.
-        labelPoint_1 = Label(self.entrys, text='Point-1:')
-        labelPoint_1.grid(row=0, column=0, pady=5, columnspan=4)
-        
-        #Cria label com texto 'X:'.
-        labelX_1 = Label(self.entrys, text='X:')
-        labelX_1.grid(row=1, column=0, pady=5, padx=2)
-        #Cria entry para receber 'x_1'.
-        x_1 = Entry(self.entrys, width=5)
-        x_1.grid(row=1, column=1, padx=2)
+        points = []
 
-        #Cria label com texto 'Y:'.        
-        labelY_1 = Label(self.entrys, text='Y:')
-        labelY_1.grid(row=1, column=2, pady=5, padx=2)
-        #Cria entry para receber 'y_1'.
-        y_1 = Entry(self.entrys, width=5)
-        y_1.grid(row=1, column=3, padx=2)
-
-
-        ########## Point-2 ##########
-        #Cria label com texto 'Point-2:'.
-        labelPoint_2 = Label(self.entrys, text='Point-2:')
-        labelPoint_2.grid(row=2, column=0, pady=5, columnspan=4)
-        
-        #Cria label com texto 'X:'.
-        labelX_2 = Label(self.entrys, text='X:')
-        labelX_2.grid(row=3, column=0, pady=5, padx=2)
-        #Cria entry para receber 'x_2'.
-        x_2 = Entry(self.entrys, width=5)
-        x_2.grid(row=3, column=1, padx=2)
-
-
-        #Cria label com texto 'Y:'.
-        labelY_2 = Label(self.entrys, text='Y:')
-        labelY_2.grid(row=3, column=2, pady=5, padx=2)
-        #Cria entry para receber 'y_2'.
-        y_2 = Entry(self.entrys, width=5)
-        y_2.grid(row=3, column=3, padx=2)
-
-        #Cria lista com os pontos da linha.
-        points = [(x_1,y_1), (x_2,y_2)]
+        self.new_entry_point(points)
+        self.new_entry_point(points)
 
         #Cria o botão 'OK' para desenhar a linha.
-        btn = Button(self, text='OK', width=3, command=lambda: window.create_object('line', points, self.color))
-        btn.pack(pady=(10,10))
+        btn = Button(self, text='OK', width=3, command=lambda: window.drawn_line(points, self.color.get()))
+        btn.grid(column=0, row=3, columnspan=2, pady=(10,10))
     
     def createWireframe(self, window):
+        points = []
 
-        ########## Point-1 ##########
-        #Cria label com texto 'Point-1:'.
-        labelPoint_1 = Label(self.entrys, text='Point-1:')
-        labelPoint_1.grid(row=0, column=0, pady=5, columnspan=4)
-        
-        #Cria label com texto 'X:'.
-        labelX_1 = Label(self.entrys, text='X:')
-        labelX_1.grid(row=1, column=0, pady=5, padx=2)
-        #Cria entry para receber 'x_1'.
-        x_1 = Entry(self.entrys, width=5)
-        x_1.grid(row=1, column=1, padx=2)
+        self.new_entry_point(points)
+        self.new_entry_point(points)
+        self.new_entry_point(points)
 
-        labelY_1 = Label(self.entrys, text='Y:')
-        labelY_1.grid(row=1, column=2, pady=5, padx=2)
-        #Cria entry para receber 'y_1'.
-        y_1 = Entry(self.entrys, width=5)
-        y_1.grid(row=1, column=3, padx=2)
+        #Cria checkbox button
+        value = BooleanVar()
+        closed = Checkbutton(self, text = 'Closed', onvalue=True, offvalue=False, variable=value)
+        closed.grid(column=0, row=3, columnspan=2, pady=(10,5))
 
-        
-        ########## Point-2 ##########
-        #Cria label com texto 'Point-2:'.
-        labelPoint_2 = Label(self.entrys, text='Point-2:')
-        labelPoint_2.grid(row=2, column=0, pady=5, columnspan=4)
-        
-        #Cria label com texto 'X:'.
-        labelX_2 = Label(self.entrys, text='X:')
-        labelX_2.grid(row=3, column=0, pady=5, padx=2)
-        #Cria entry para receber 'x_2'.
-        x_2 = Entry(self.entrys, width=5)
-        x_2.grid(row=3, column=1, padx=2)
-
-        #Cria label com texto 'Y:'.
-        labelY_2 = Label(self.entrys, text='Y:')
-        labelY_2.grid(row=3, column=2, pady=5, padx=2)
-        #Cria entry para receber 'y_2'.
-        y_2 = Entry(self.entrys, width=5)
-        y_2.grid(row=3, column=3, padx=2)
-
-        
-        ########## Point-3 ##########
-        #Cria label com texto 'Point-3:'.
-        labelPoint_3 = Label(self.entrys, text='Point-3:')
-        labelPoint_3.grid(row=4, column=0, pady=5, columnspan=4)
-
-        #Cria label com texto 'X:'.
-        labelX_3 = Label(self.entrys, text='X:')
-        labelX_3.grid(row=5, column=0, pady=5, padx=2)
-        #Cria entry para receber 'x_3'.
-        x_3 = Entry(self.entrys, width=5)
-        x_3.grid(row=5, column=1, padx=2)
-
-        #Cria label com texto 'Y:'.
-        labelY_3 = Label(self.entrys, text='Y:')
-        labelY_3.grid(row=5, column=2, pady=5, padx=2)
-        #Cria entry para receber 'y_3'.
-        y_3 = Entry(self.entrys, width=5)
-        y_3.grid(row=5, column=3, padx=2)
-
-        
-        ########## Point-4 ##########
-        #Cria label com texto 'Point-4:'.
-        labelPoint_4 = Label(self.entrys, text='Point-4:')
-        labelPoint_4.grid(row=6, column=0, pady=5, columnspan=4)
-        
-        #Cria label com texto 'X:'.
-        labelX_4 = Label(self.entrys, text='X:')
-        labelX_4.grid(row=7, column=0, pady=5, padx=2)
-        #Cria entry para receber 'x_4'.
-        x_4 = Entry(self.entrys, width=5)
-        x_4.grid(row=7, column=1, padx=2)
-
-        #Cria label com texto 'Y:'.
-        labelY_4 = Label(self.entrys, text='Y:')
-        labelY_4.grid(row=7, column=2, pady=5, padx=2)
-        #Cria entry para receber 'y_4'.
-        y_4 = Entry(self.entrys, width=5)
-        y_4.grid(row=7, column=3, padx=2)
-
-        #Cria lista com os pontos do wireframe
-        points = [(x_1,y_1),(x_2,y_2),(x_3,y_3),(x_4,y_4)]
+        #Cria o botão 'MORE' para desenhar adicionar mais uma entrada de ponto.
+        btn = Button(self, text='MORE', width=3, command=lambda: self.new_entry_point(points))
+        btn.grid(column=0, row=4, columnspan=2, pady=(5,5))
 
         #Cria o botão 'OK' para desenhar o wireframe.
-        btn = Button(self, text='OK', width=3, command=lambda: window.create_object('wireframe', points, self.color))
-        btn.pack(pady=(10,10))
+        OK = Button(self, text='OK', width=3, command=lambda: window.drawn_wireframe(points, self.color.get(), value.get()))
+        OK.grid(column=0, row=5, columnspan=2,pady=(5,10))
     

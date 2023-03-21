@@ -24,8 +24,15 @@ class Window(Canvas):
         zoomOut() -> None
             Diminui o tamanho da window.
 
-        create_object(str: object, list: points, Combobox: color) -> 
-            Desenha um objeto na window conforme o seu tipo 'object(point, line, wireframe)'.
+        drawn_point(tuple: point, str: color) -> None
+            Desenha um ponto na window.
+
+        drawn_line(list: points, str: color) -> None
+            Desenha uma linha na window.
+
+        drawn_wireframe(list: points,str: color,boolean: closed) -> None
+            Desenha um wireframe na window.
+
     """
 
     def __init__(self, mainframe):
@@ -55,25 +62,29 @@ class Window(Canvas):
         self.scale('all', 0, 0, 0.5, 0.5)
         self.mainframe.configure(scrollregion=self.mainframe.bbox("all"))
 
-    def create_object(self, object, points, color):
+    def drawn_point(self, point, color):
+        #Desenha o ponto e adiciona no displayfile.
+        x, y = (point[0].get(),point[1].get())
+        self.displayfile.append(self.create_oval(x,y,x,y,fill=color, width=1))
 
-        if object == 'point':
-            #Desenha o ponto e adiciona no displayfile.
-            x, y = (points[0][0].get(),points[0][1].get())
-            self.displayfile.append(self.create_oval(x,y,x,y,fill=color.get(), width=1))
-        elif object == 'line':
-            #Desenha a linha e adiciona no displayfile.
-            x1, y1 = (points[0][0].get(),points[0][1].get())
-            x2, y2 = (points[1][0].get(),points[1][1].get())
-            self.displayfile.append(self.create_line(x1,y1,x2,y2,fill=color.get()))
+    def drawn_line(self, points, color):
+        #Desenha a linha e adiciona no displayfile.
+        x1, y1 = (points[0][0].get(),points[0][1].get())
+        x2, y2 = (points[1][0].get(),points[1][1].get())
+        self.displayfile.append(self.create_line(x1,y1,x2,y2,fill=color))
 
-        elif object == 'wireframe':
-            #Desenha o wireframe e adiciona no displayfile.
-            x1, y1 = (points[0][0].get(),points[0][1].get())
-            x2, y2 = (points[1][0].get(),points[1][1].get())
-            x3, y3 = (points[2][0].get(),points[2][1].get())
-            x4, y4 = (points[3][0].get(),points[3][1].get())
-            self.displayfile.append(self.create_line(x1,y1,x2,y2,fill=color.get()))
-            self.displayfile.append(self.create_line(x1,y1,x3,y3,fill=color.get()))
-            self.displayfile.append(self.create_line(x2,y2,x4,y4,fill=color.get()))
-            self.displayfile.append(self.create_line(x3,y3,x4,y4,fill=color.get()))
+    def drawn_wireframe(self, points, color, closed):
+
+        wireframe_lines = []
+        #Desenha o wireframe e adiciona no displayfile.
+        for i in range(len(points)-1):
+            x1, y1 = (points[i][0].get(),points[i][1].get())
+            x2, y2 = (points[i+1][0].get(),points[i+1][1].get())
+            wireframe_lines.append(self.create_line(x1,y1,x2,y2,fill=color))
+        
+        if closed:
+            x1, y1 = (points[len(points)-1][0].get(),points[len(points)-1][1].get())
+            x2, y2 = (points[0][0].get(),points[0][1].get())
+            wireframe_lines.append(self.create_line(x1,y1,x2,y2,fill=color))
+            
+        self.displayfile.append(wireframe_lines)
