@@ -76,8 +76,8 @@ class Transform():
         return result
     
     def rotation(points, grau, x, y):
-        dx = x - 0
-        dy = y - 0
+        dx = x
+        dy = y
         
         #Matriz de translação que move objeto para um ponto qualquer.
         matrix_transition_point = [
