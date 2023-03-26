@@ -79,7 +79,7 @@ class Transform():
         dx = x
         dy = y
         
-        #Matriz de translação que move objeto para um ponto qualquer.
+        #Matriz de translação que move objeto para uma distancia -dx e -dy.
         matrix_transition_point = [
                   [1,0,0],
                   [0,1,0],
@@ -92,7 +92,7 @@ class Transform():
                   [0,0,1]
                   ]
         
-        #Matriz de translação que move o objeto para o seu ponto inicial.
+        #Matriz de translação que move objeto para uma distancia dx e dy.
         matrix_transition_initial = [
                   [1,0,0],
                   [0,1,0],
