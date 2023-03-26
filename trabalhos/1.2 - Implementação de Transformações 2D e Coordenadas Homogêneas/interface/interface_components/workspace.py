@@ -1,6 +1,6 @@
 from tkinter import *
-from components.viewport import Viewport
-from components. debug import Debug
+from interface.interface_components.workspace_components.viewport import Viewport
+from interface.interface_components.workspace_components.debug import Debug
 
 
 class Workspace(Frame):
@@ -31,6 +31,7 @@ class Workspace(Frame):
     """
     
     def __init__(self, mainframe):
+        self.interface = mainframe
         #Set frame workspace.
         Frame.__init__(self, 
                        mainframe, 
@@ -39,6 +40,7 @@ class Workspace(Frame):
                        background="#9b9b9b",
                        borderwidth=2, 
                        relief=RAISED)
+        
         self.pack_propagate(0)
 
 
@@ -56,3 +58,6 @@ class Workspace(Frame):
     
     def getDebug(self):
         return self.debug
+    
+    def getInterface(self):
+        return self.interface

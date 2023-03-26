@@ -41,16 +41,15 @@ class windowCreationObject(Toplevel):
     """
     def __init__(self):
         Toplevel.__init__(self)
-
+        self.geometry("220x430")
+        self.resizable(False, False)
+        
         #Cria label com texto 'Cor:'.
-        self.labelCor = Label(self, text='Cor:')
-        self.labelCor.grid(column=0, row=0, columnspan=2, pady=(10,5))
+        self.labelName = Label(self, text='Name:')
+        self.labelName.grid(column=0, row=0, columnspan=2, pady=(10,0))
 
-        #Cria boxlist para escolha da cor do objeto a ser desenhado.
-        self.color = ttk.Combobox(self, state= "readonly")
-        self.color['values'] = ('black','red', 'yellow', 'blue', 'green', 'gray', 'orange')
-        self.color.current(0)
-        self.color.grid(column=0, row=1, columnspan=2, pady=(0,10), padx=20)
+        self.name = Entry(self, width=20)
+        self.name.grid(column=0, row=1, columnspan=2, pady=(5,5))
 
         #Cria o scrollbar vertical.
         self.scrollbar = Scrollbar(self,orient=VERTICAL)
@@ -68,6 +67,16 @@ class windowCreationObject(Toplevel):
         self.canvas_entries.create_window(0,0, window=self.entries, anchor='n')
         self.canvas_entries.configure(scrollregion=self.canvas_entries.bbox("all"))
 
+        #Cria label com texto 'Color:'.
+        self.labelCor = Label(self, text='Color:')
+        self.labelCor.grid(column=0, row=3, columnspan=2, pady=5)
+
+        #Cria boxlist para escolha da cor do objeto a ser desenhado.
+        self.color = ttk.Combobox(self, state= "readonly")
+        self.color['values'] = ('black','red', 'yellow', 'blue', 'green', 'gray', 'orange')
+        self.color.current(0)
+        self.color.grid(column=0, row=4, columnspan=2, pady=(0,10), padx=20)
+
     def new_entry_point(self, points_list):
             n_points = len(points_list)
             point_n = n_points + 1
@@ -78,17 +87,17 @@ class windowCreationObject(Toplevel):
             
             #Cria label com texto 'X:'.
             labelX = Label(self.entries, text='X:')
-            labelX.grid(row=n_points*2 + 1, column=0, pady=5, padx=2)
+            labelX.grid(row=n_points*2 + 1, column=0, pady=5)
             #Cria entry para receber 'x'.
             x = Entry(self.entries, width=5)
-            x.grid(row=n_points*2 + 1, column=1, padx=2)
+            x.grid(row=n_points*2 + 1, column=1)
 
             #Cria label com texto 'Y:'.
             labelY = Label(self.entries, text='Y:')
-            labelY.grid(row=n_points*2 + 1, column=2, pady=5, padx=2)
+            labelY.grid(row=n_points*2 + 1, column=2, pady=5)
             #Cria entry para receber 'y'.
             y = Entry(self.entries, width=5)
-            y.grid(row=n_points*2 + 1, column=3, padx=2)
+            y.grid(row=n_points*2 + 1, column=3)
 
             #Adiciona entries como um ponto na lista de pontos
             points_list.append((x,y))
@@ -104,8 +113,8 @@ class windowCreationObject(Toplevel):
         self.new_entry_point(points)
 
         #Cria o botão 'OK' para desenhar o ponto.
-        btn = Button(self, text='OK', width=3, command=lambda: viewport.drawn_point(points[0], self.color.get()))
-        btn.grid(column=0, row=3, columnspan=2, pady=(10,10))
+        btn = Button(self, text='OK', width=3, command=lambda: viewport.drawn_point(self.name.get(), points[0], self.color.get()))
+        btn.grid(column=0, row=5, columnspan=2, pady=(10,10))
 
     def createLine(self, viewport):
         points = []
@@ -114,8 +123,8 @@ class windowCreationObject(Toplevel):
         self.new_entry_point(points)
 
         #Cria o botão 'OK' para desenhar a linha.
-        btn = Button(self, text='OK', width=3, command=lambda: viewport.drawn_line(points, self.color.get()))
-        btn.grid(column=0, row=3, columnspan=2, pady=(10,10))
+        btn = Button(self, text='OK', width=3, command=lambda: viewport.drawn_line(self.name.get(), points, self.color.get()))
+        btn.grid(column=0, row=5, columnspan=2, pady=(10,10))
     
     def createWireframe(self, viewport):
         points = []
@@ -127,13 +136,13 @@ class windowCreationObject(Toplevel):
         #Cria checkbox button
         value = BooleanVar()
         closed = Checkbutton(self, text = 'Closed', onvalue=True, offvalue=False, variable=value)
-        closed.grid(column=0, row=3, columnspan=2, pady=(10,5))
+        closed.grid(column=0, row=5, columnspan=2, pady=(10,5))
 
         #Cria o botão 'MORE' para adicionar mais uma entrada de ponto.
         btn = Button(self, text='MORE', width=3, command=lambda: self.new_entry_point(points))
-        btn.grid(column=0, row=4, columnspan=2, pady=(5,5))
+        btn.grid(column=0, row=6, columnspan=2, pady=(5,5))
 
         #Cria o botão 'OK' para desenhar o wireframe.
-        OK = Button(self, text='OK', width=3, command=lambda: viewport.drawn_wireframe(points, self.color.get(), value.get()))
-        OK.grid(column=0, row=5, columnspan=2,pady=(5,10))
+        OK = Button(self, text='OK', width=3, command=lambda: viewport.drawn_wireframe(self.name.get(), points, self.color.get(), value.get()))
+        OK.grid(column=0, row=7, columnspan=2,pady=(5,10))
     

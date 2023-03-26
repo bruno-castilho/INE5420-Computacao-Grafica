@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import ttk
-from components.windowcreationobject import windowCreationObject
+from interface.interface_components.menu_components.objects_components.windowcreationobject import windowCreationObject
 
-class Objects(Frame):
+class NewObject(Frame):
     """
     ...
         Uma classe para criar um frame Objects.
@@ -27,24 +27,22 @@ class Objects(Frame):
     Métodos
     -------
         create() -> None:
-            Abre uma jenala de criação de objeto, conforme o tipo.
+            Abre uma janela de criação de objeto, conforme o tipo.
     """
     def __init__(self, mainframe):
-        self.menu = mainframe
+        self.mainframe = mainframe
 
         #Set frame objects.
         Frame.__init__(self, 
-                       self.menu, 
-                       highlightbackground="black", 
-                       highlightthickness=1, 
+                       mainframe, 
                        background="#9b9b9b",
-                       width=190, 
+                       width=180, 
                        height=90)
         
         self.pack_propagate(0)
 
         #Cria label com texto 'Objects'.
-        self.text = Label(self, text='Objects', background="#9b9b9b")
+        self.text = Label(self, text='New Object', background="#9b9b9b")
         self.text.pack(pady=(0,5))
         
         #Cria boxlist para escolha do objeto a ser criado.
@@ -54,12 +52,13 @@ class Objects(Frame):
         self.object.pack(pady=(0,5))
 
         #Cria botão 'set' para abrir a janela de criação do objeto escolhido.
-        self.btn = Button(self, text='SET', command=self.create)
-        self.btn.pack(pady=(0,5))
+        self.crate = Button(self, text='CREATE', command=self.create)
+        self.crate.pack(pady=(0,5))
 
     def create(self):
         #Busca objeto viewport na memoria
-        interface = self.menu.getInterface()
+        menu = self.mainframe.getMenu()
+        interface = menu.getInterface()
         workspace = interface.getWorkspace()
         viewport = workspace.getViewport()
 
