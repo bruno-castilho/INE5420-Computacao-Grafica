@@ -65,25 +65,29 @@ class Viewport(Canvas):
     def move_up(self):
         #move os objetos para cima
         for name in self.displayfile:
-            self.move(self.displayfile[name], 0, -10)
+            for object in self.displayfile[name]:
+                self.move(object, 0, -10)
         self.update()
 
     def move_left(self):
         #move os objetos para esquerda
         for name in self.displayfile:
-            self.move(self.displayfile[name], -10, 0)
+            for object in self.displayfile[name]:
+                self.move(object, -10, 0)
         self.update()
 
     def move_right(self):
         #move os objetos para direita
         for name in self.displayfile:
-            self.move(self.displayfile[name], 10, 0)
+            for object in self.displayfile[name]:
+                self.move(object, 10, 0)
         self.update()
 
     def move_down(self):
         #move os objetos para baixo
         for name in self.displayfile:
-            self.move(self.displayfile[name], 0, 10)
+            for object in self.displayfile[name]:
+                self.move(object, 0, 10)
         self.update()
         
     def zoomIn(self):
