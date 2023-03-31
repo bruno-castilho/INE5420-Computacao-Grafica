@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from interface.interface_components.menu_components.objects_components.windowtransform import windowTransform
+from globals import *
 
 class CurrentObjects(Frame):
     """
@@ -29,7 +30,7 @@ class CurrentObjects(Frame):
         openWindow() -> None:
             Abre uma janela de transformação de objeto.
 
-        updateObjects(dic: displayfile) -> None:
+        updateObjects() -> None:
             Atualiza boxList de objetos.
 
     """
@@ -69,7 +70,7 @@ class CurrentObjects(Frame):
         #Inicia janela
         top.mainloop()
     
-    def updateObjects(self, displayfile):
+    def updateObjects(self):
         #Atualiza boxList
         self.objectsBoxList['values'] = list(displayfile.keys())
         self.objectsBoxList.current(0)

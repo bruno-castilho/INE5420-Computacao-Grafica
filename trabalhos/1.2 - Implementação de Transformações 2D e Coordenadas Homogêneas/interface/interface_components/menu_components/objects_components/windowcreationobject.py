@@ -1,5 +1,7 @@
 from tkinter import * 
 from tkinter import ttk
+from utils.object import Object
+from globals import *
 
 class windowCreationObject(Toplevel):
     """
@@ -7,8 +9,16 @@ class windowCreationObject(Toplevel):
         Uma classe para criar um Toplevel Objects.
     ...
 
+    Args
+    ---------
+        _mainframe: Tk
+            Objeto Menu.
+
     Atributos
     ---------
+        _currentObjects: Frame:
+            Objeto currentObjects.
+
         _labelCor: Label
             Objeto Label para apresentar o texto 'Cor:'.
 
@@ -30,18 +40,23 @@ class windowCreationObject(Toplevel):
         new_entry_point(list: points_list) -> None:
             Função que gera entries para recebimento de pontos e insere no frame entries.
 
-        createPoint(Canvas: window) -> None:
+        createPoint(Viewport: viewport) -> None:
             Monta a janela para criar um ponto.
 
-        createLine(Canvas: window) -> None:
+        createLine(Viewport: viewport) -> None:
             Monta a janela para criar uma linha.
 
-        createWireframe(Canvas: window) -> None:
+        createWireframe(Viewport: viewport) -> None:
             Monta a janela para criar um wireframe.
     """
-    def __init__(self):
+
+    def __init__(self, menu):
+        #Busca frame currentObjects na memoria.
+        objects = menu.getObjects()
+        self.currentObjects = objects.getCurrentObjects()
+
         Toplevel.__init__(self)
-        self.geometry("220x430")
+        self.geometry("220x440")
         self.resizable(False, False)
         
         #Cria label com texto 'Cor:'.
@@ -106,32 +121,67 @@ class windowCreationObject(Toplevel):
             scrollregion = self.canvas_entries.bbox("all")
             self.canvas_entries.configure(scrollregion=(scrollregion[0],scrollregion[1],scrollregion[2], scrollregion[3]+70))
 
-
     def createPoint(self, viewport):
-        points = []
+        entries_points = []
+        #Cria e adiciona objeto no display file e redesenha a viewport.
+        def create():
+             name = self.name.get()
+             color = self.color.get()
+             
+             points = [(float(entries_points[0][0].get()), float(entries_points[0][1].get()))]
+             displayfile[name] = Object(name, 0, points, color)
+             viewport.draw()
 
-        self.new_entry_point(points)
+             self.currentObjects.updateObjects()
+
+        self.new_entry_point(entries_points)
 
         #Cria o botão 'OK' para desenhar o ponto.
-        btn = Button(self, text='OK', width=3, command=lambda: viewport.drawn_point(self.name.get(), points[0], self.color.get()))
+        btn = Button(self, text='OK', width=3, command=create)
         btn.grid(column=0, row=5, columnspan=2, pady=(10,10))
 
     def createLine(self, viewport):
-        points = []
+        entries_points = []
 
-        self.new_entry_point(points)
-        self.new_entry_point(points)
+        #Cria e adiciona objeto no display file e redesenha a viewport.
+        def create():
+             name = self.name.get()
+             color = self.color.get()
+             points = []
+             for entry in entries_points:
+                  points.append((float(entry[0].get()), float(entry[1].get())))
+
+             displayfile[name] = Object(name, 1, points, color)
+             viewport.draw()
+
+             self.currentObjects.updateObjects()
+
+        self.new_entry_point(entries_points)
+        self.new_entry_point(entries_points)
 
         #Cria o botão 'OK' para desenhar a linha.
-        btn = Button(self, text='OK', width=3, command=lambda: viewport.drawn_line(self.name.get(), points, self.color.get()))
+        btn = Button(self, text='OK', width=3, command=create)
         btn.grid(column=0, row=5, columnspan=2, pady=(10,10))
     
     def createWireframe(self, viewport):
-        points = []
+        entries_points = []
 
-        self.new_entry_point(points)
-        self.new_entry_point(points)
-        self.new_entry_point(points)
+        #Cria e adiciona objeto no display file e redesenha a viewport.
+        def create():
+            name = self.name.get()
+            color = self.color.get()
+            points = []
+            for entry in entries_points:
+                  points.append((float(entry[0].get()), float(entry[1].get())))
+
+            displayfile[name] = Object(name, 2, points, color, closed=True)
+            viewport.draw()
+
+            self.currentObjects.updateObjects()
+
+        self.new_entry_point(entries_points)
+        self.new_entry_point(entries_points)
+        self.new_entry_point(entries_points)
 
         #Cria checkbox button
         value = BooleanVar()
@@ -139,10 +189,10 @@ class windowCreationObject(Toplevel):
         closed.grid(column=0, row=5, columnspan=2, pady=(10,5))
 
         #Cria o botão 'MORE' para adicionar mais uma entrada de ponto.
-        btn = Button(self, text='MORE', width=3, command=lambda: self.new_entry_point(points))
+        btn = Button(self, text='MORE', width=3, command=lambda: self.new_entry_point(entries_points))
         btn.grid(column=0, row=6, columnspan=2, pady=(5,5))
 
         #Cria o botão 'OK' para desenhar o wireframe.
-        OK = Button(self, text='OK', width=3, command=lambda: viewport.drawn_wireframe(self.name.get(), points, self.color.get(), value.get()))
+        OK = Button(self, text='OK', width=3, command=create)
         OK.grid(column=0, row=7, columnspan=2,pady=(5,10))
     

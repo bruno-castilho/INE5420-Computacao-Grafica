@@ -18,7 +18,7 @@ class NewObject(Frame):
         _text: Label
             Objeto Label para apresentar o texto 'Objects'.
 
-        _object: Combobox
+        _objects: Combobox
             Objeto Combobox para escolha de um objeto ('point','line', 'wireframe').
 
         _btn: Button
@@ -27,7 +27,7 @@ class NewObject(Frame):
     Métodos
     -------
         create() -> None:
-            Abre uma janela de criação de objeto, conforme o tipo.
+            Abre uma jenala de criação de objeto, conforme o tipo.
     """
     def __init__(self, mainframe):
         self.mainframe = mainframe
@@ -46,10 +46,10 @@ class NewObject(Frame):
         self.text.pack(pady=(0,5))
         
         #Cria boxlist para escolha do objeto a ser criado.
-        self.object = ttk.Combobox(self, state= "readonly")
-        self.object['values'] = ('point','line', 'wireframe')
-        self.object.current(0)
-        self.object.pack(pady=(0,5))
+        self.objects = ttk.Combobox(self, state= "readonly")
+        self.objects['values'] = ('point','line', 'wireframe')
+        self.objects.current(0)
+        self.objects.pack(pady=(0,5))
 
         #Cria botão 'set' para abrir a janela de criação do objeto escolhido.
         self.crate = Button(self, text='CREATE', command=self.create)
@@ -63,14 +63,14 @@ class NewObject(Frame):
         viewport = workspace.getViewport()
 
         #Cria janela para criação do objeto
-        top = windowCreationObject()
+        top = windowCreationObject(menu)
 
         #Define que tipo de objeto será criado
-        if self.object.get() == 'point':
+        if self.objects.get() == 'point':
             top.createPoint(viewport)
-        if self.object.get() == 'line':
+        if self.objects.get() == 'line':
             top.createLine(viewport)
-        if self.object.get() == 'wireframe':
+        if self.objects.get() == 'wireframe':
             top.createWireframe(viewport)
 
         #Inicia janela

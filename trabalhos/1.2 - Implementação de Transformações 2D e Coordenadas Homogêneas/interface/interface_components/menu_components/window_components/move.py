@@ -1,5 +1,5 @@
-
 from tkinter import * 
+from globals import *
 
 class Move(Frame):
     """
@@ -19,18 +19,30 @@ class Move(Frame):
             Objeto Label para apresentar o texto 'MOVE'.
         
         _up:
-            Objeto Button para mover os objetos para cima.
+            Objeto Button para mover a window para cima.
 
         _left:
-            Objeto Button para mover os objetos para esquerda.
+            Objeto Button para mover a window para esquerda.
 
         _right:
-            Objeto Button para mover os objetos para direita.
+            Objeto Button para mover a window para direita.
 
         _down:
-            Objeto Button para mover os objetos para baixo.
+            Objeto Button para mover a window para baixo.
 
+    Métodos
+    -------
+        moveUp(Viewport: viewport) -> None
+            Move a window para cima e redesenha os objetos na viewport.
 
+        moveLeft(Viewport: viewport) -> None
+            Move a window para esquerda e redesenha os objetos na viewport.
+
+        moveRight(Viewport: viewport) -> None
+            Move a window para direita e redesenha os objetos na viewport.
+
+        moveDown(Viewport: viewport) -> None
+            Move a window para baixo e redesenha os objetos na viewport.
     """
     def __init__(self, mainframe):
         #Set frame move
@@ -51,17 +63,41 @@ class Move(Frame):
         self.text.grid(column=0,row=0, columnspan=3, sticky='nwes')
 
         #Cria botão UP
-        self.up = Button(self, text='UP', width=3, command=viewport.move_up)
+        self.up = Button(self, text='UP', width=3, command=lambda: self.moveUp(viewport))
         self.up.grid(column=1,row=1, sticky='nwes' )
 
         #Cria botão LEFT
-        self.left = Button(self, text='LEFT', width=3, command=viewport.move_left)
+        self.left = Button(self, text='LEFT', width=3, command=lambda: self.moveLeft(viewport))
         self.left.grid(column=0,row=2, sticky='nwes')
         
         #Cria botão RIGHT
-        self.right = Button(self, text='RIGHT', width=3, command=viewport.move_right)
+        self.right = Button(self, text='RIGHT', width=3, command=lambda: self.moveRight(viewport))
         self.right.grid(column=2,row=2, sticky='nwes')
 
         #Cria botão DOWN
-        self.down = Button(self, text='DOWN', width=3, command=viewport.move_down)
+        self.down = Button(self, text='DOWN', width=3, command=lambda: self.moveDown(viewport))
         self.down.grid(column=1,row=3, sticky='nwes')
+
+    def moveUp(self, viewport):
+        #Move a window para cima.
+        window.moveUp()
+        #Redesenha os objetos na viewport.
+        viewport.draw()
+    
+    def moveLeft(self, viewport):
+        #Move a window para cima.
+        window.moveLeft()
+        #Redesenha os objetos na viewport.
+        viewport.draw()
+    
+    def moveRight(self, viewport):
+        #Move a window para cima.
+        window.moveRight()
+        #Redesenha os objetos na viewport.
+        viewport.draw()
+    
+    def moveDown(self, viewport):
+        #Move a window para cima.
+        window.moveDown()
+        #Redesenha os objetos na viewport.
+        viewport.draw()

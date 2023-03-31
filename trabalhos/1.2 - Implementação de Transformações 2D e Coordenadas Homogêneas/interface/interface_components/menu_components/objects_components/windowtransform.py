@@ -1,5 +1,6 @@
 from tkinter import * 
-from tkinter import ttk
+from utils.transform import Transform
+from globals import *
 
 class windowTransform(Toplevel):
     """
@@ -90,7 +91,37 @@ class windowTransform(Toplevel):
         self.rotation_arbitrary_point = self.createFrameRotationArbitraryPoint(objectName, viewport)
         self.rotation_arbitrary_point.grid(column=4, row=2,columnspan=2,sticky='nwes', padx=1, pady=1)
 
-    def createFrameTranslation(self,objectName, viewport):
+    def createFrameTranslation(self, objectName, viewport):
+        def move(dx, dy):
+            #Busca objeto no displayfile.
+            object = displayfile[objectName]
+
+            #Constroi matriz dos pontos.
+            matrix_points = []
+            for point in object.getPoints():
+                matrix_points.append([point[0],point[1], 1])
+
+            
+            #Gera matriz de translação.
+            matrix_transition = Transform.translation(dx, dy)
+
+            #matrix_points x matrix_transition
+            result = [[sum(a * b for a, b in zip(A_row, B_col))  
+                        for B_col in zip(*matrix_transition)] 
+                                for A_row in matrix_points] 
+            
+
+            #Set novos pontos
+            new_points = []
+            for point in result:
+                new_points.append((point[0],point[1]))
+
+            object.setPoints(new_points)
+            
+            #Redesenha a viewport
+            viewport.draw()
+
+
         #Cria frame para posicionar na janela.
         translation = Frame(self, width=240, height=110,highlightbackground="black",highlightthickness=1)
         translation.pack_propagate(0)
@@ -115,18 +146,68 @@ class windowTransform(Toplevel):
         #Cria botão para fazer a transformação.
         Button(frame, 
                text='set', 
-               command=lambda: viewport.transformObject(objectName, 'translation', dx=float(Dx.get()), dy=float(Dy.get()))
+               command=lambda: move(dx=float(Dx.get()), dy=float(Dy.get()))
                ).grid(column=0, row=2, columnspan=4, pady=5)
         
         return translation
 
     def createFrameScale(self,objectName, viewport):
+        def scale(sx, sy):
+            #Busca objeto no displayfile.
+            object = displayfile[objectName]
+
+            #Constroi matriz dos pontos.
+            matrix_points = []
+            for point in object.getPoints():
+                matrix_points.append([point[0],point[1], 1])
+
+            
+            #Econtra ponto central do objeto.
+            cx = sum(point[0]/len(matrix_points) for point in matrix_points)
+            cy = sum(point[1]/len(matrix_points) for point in matrix_points)
+
+            #Gera matriz de translação para a origem.
+            matrix_transition_origin = Transform.translation(-1*cx,-1*cy)
+
+            #Gera matriz de escalonamento.
+            matrix_scaling = Transform.scale(sx, sy)
+
+            #Gera matriz de translação para o ponto inicial.
+            matrix_transition_initial = Transform.translation(cx,cy)
+            
+
+            #matrix_transition_origin x matrix_scaling
+            matriz_origin_scaling = [[sum(a * b for a, b in zip(A_row, B_col))  
+                                        for B_col in zip(*matrix_scaling)] 
+                                            for A_row in matrix_transition_origin] 
+
+            #matrix_transition_origin x matrix_scaling X matrix_transition_initial
+            matriz_origin_scaling_initial = [[sum(a * b for a, b in zip(A_row, B_col))  
+                                                for B_col in zip(*matrix_transition_initial)] 
+                                                    for A_row in matriz_origin_scaling] 
+
+            #matrix_points x matriz_origin_scaling_initial
+            result = [[sum(a * b for a, b in zip(A_row, B_col))  
+                        for B_col in zip(*matriz_origin_scaling_initial)] 
+                            for A_row in matrix_points] 
+            
+
+            #Set novos pontos
+            new_points = []
+            for point in result:
+                new_points.append((point[0],point[1]))
+
+            object.setPoints(new_points)
+            
+            #Redesenha a viewport
+            viewport.draw()
+
         #Cria frame para posicionar na janela.
-        scale = Frame(self, width=240, height=110,highlightbackground="black",highlightthickness=1)
-        scale.pack_propagate(0)
+        frameScale = Frame(self, width=240, height=110,highlightbackground="black",highlightthickness=1)
+        frameScale.pack_propagate(0)
 
         #Cria frame para posicionar os widgets.
-        frame = Frame(scale)
+        frame = Frame(frameScale)
         frame.pack()
 
         #Cria label com o texto 'Scale'.
@@ -145,12 +226,62 @@ class windowTransform(Toplevel):
         #Cria botão para fazer a transformação.
         Button(frame, 
                text='set', 
-               command=lambda: viewport.transformObject(objectName, 'scale', sx=float(Sx.get()), sy=float(Sy.get()))
+               command=lambda: scale(sx=float(Sx.get()), sy=float(Sy.get()))
                ).grid(column=0, row=2, columnspan=4, pady=5)
         
-        return scale
+        return frameScale
     
     def createFrameRotationObjectCenter(self, objectName, viewport):
+        def rotation(angle):
+            #Busca objeto no displayfile.
+            object = displayfile[objectName]
+
+            #Constroi matriz dos pontos.
+            matrix_points = []
+            for point in object.getPoints():
+                matrix_points.append([point[0],point[1], 1])
+
+            
+            #Econtra ponto central do objeto.
+            cx = sum(point[0]/len(matrix_points) for point in matrix_points)
+            cy = sum(point[1]/len(matrix_points) for point in matrix_points)
+
+            #Gera matriz de translação para a origem.
+            matrix_transition_origin = Transform.translation(-1*cx,-1*cy)
+
+            #Gera matriz de rotação.
+            matrix_rotation = Transform.rotation(angle)
+
+            #Gera matriz de translação para o ponto inicial.
+            matrix_transition_initial = Transform.translation(cx,cy)
+            
+
+            #matrix_transition_origin x matrix_scaling
+            matriz_origin_rotation = [[sum(a * b for a, b in zip(A_row, B_col))  
+                                        for B_col in zip(*matrix_rotation)] 
+                                            for A_row in matrix_transition_origin] 
+
+            #matrix_transition_origin x matrix_scaling X matrix_transition_initial
+            matriz_origin_rotation_initial = [[sum(a * b for a, b in zip(A_row, B_col))  
+                                                for B_col in zip(*matrix_transition_initial)] 
+                                                    for A_row in matriz_origin_rotation] 
+
+            #matrix_points x matriz_origin_scaling_initial
+            result = [[sum(a * b for a, b in zip(A_row, B_col))  
+                        for B_col in zip(*matriz_origin_rotation_initial)] 
+                            for A_row in matrix_points] 
+            
+
+            #Set novos pontos
+            new_points = []
+            for point in result:
+                new_points.append((point[0],point[1]))
+
+            object.setPoints(new_points)
+            
+            #Redesenha a viewport
+            viewport.draw()
+
         #Cria frame para posicionar na janela.
         rotation_object_center = Frame(self, width=160, height=120,highlightbackground="black",highlightthickness=1)
         rotation_object_center.pack_propagate(0)
@@ -170,12 +301,40 @@ class windowTransform(Toplevel):
         #Cria botão para fazer a transformação.
         Button(frame, 
                text='set', 
-               command=lambda: viewport.transformObject(objectName, 'rotation_object_center', angle=float(angle.get()))
+               command=lambda: rotation(angle=float(angle.get()))
                ).grid(column=0, row=2, columnspan=2, pady=5)
         
         return rotation_object_center
 
     def createFrameRotationtWorldCenter(self, objectName, viewport):
+        def rotation(angle):
+            #Busca objeto no displayfile.
+            object = displayfile[objectName]
+
+            #Constroi matriz dos pontos.
+            matrix_points = []
+            for point in object.getPoints():
+                matrix_points.append([point[0],point[1], 1])
+
+            
+            #Gera matriz de rotação.
+            matrix_rotation = Transform.rotation(angle)
+
+            #matrix_points x matriz_origin_scaling_initial
+            result = [[sum(a * b for a, b in zip(A_row, B_col))  
+                        for B_col in zip(*matrix_rotation)] 
+                            for A_row in matrix_points] 
+            
+            #Set novos pontos
+            new_points = []
+            for point in result:
+                new_points.append((point[0],point[1]))
+
+            object.setPoints(new_points)
+            
+            #Redesenha a viewport
+            viewport.draw()
+        
         #Cria frame para posicionar na janela.
         rotation_world_center = Frame(self, width=160, height=120,highlightbackground="black",highlightthickness=1)
         rotation_world_center.pack_propagate(0)
@@ -195,12 +354,57 @@ class windowTransform(Toplevel):
         #Cria botão para fazer a transformação.
         Button(frame, 
                text='set', 
-               command=lambda: viewport.transformObject(objectName, 'rotation_world_center', angle=float(angle.get()))
+               command=lambda: rotation(angle=float(angle.get()))
                ).grid(column=0, row=2, columnspan=2, pady=5)
         
         return rotation_world_center
     
     def createFrameRotationArbitraryPoint(self, objectName, viewport):
+        def rotation(angle, x, y):
+            #Busca objeto no displayfile.
+            object = displayfile[objectName]
+
+            #Constroi matriz dos pontos.
+            matrix_points = []
+            for point in object.getPoints():
+                matrix_points.append([point[0],point[1], 1])
+
+            
+            #Gera matriz de translação x, y.
+            matrix_transition_XY = Transform.translation(-1*x,-1*y)
+
+            #Gera matriz de rotação.
+            matrix_rotation = Transform.rotation(angle)
+
+            #Gera matriz de translação para o ponto inicial.
+            matrix_transition_initial = Transform.translation(x,y)
+            
+
+            #matrix_transition_XY x matrix_scaling
+            matriz_XY_rotation = [[sum(a * b for a, b in zip(A_row, B_col))  
+                                        for B_col in zip(*matrix_rotation)] 
+                                            for A_row in matrix_transition_XY] 
+
+            #matrix_transition_XY x matrix_scaling X matrix_transition_initial
+            matriz_XY_rotation_initial = [[sum(a * b for a, b in zip(A_row, B_col))  
+                                                for B_col in zip(*matrix_transition_initial)] 
+                                                    for A_row in matriz_XY_rotation] 
+
+            #matrix_points x matriz_XY_scaling_initial
+            result = [[sum(a * b for a, b in zip(A_row, B_col))  
+                        for B_col in zip(*matriz_XY_rotation_initial)] 
+                            for A_row in matrix_points] 
+            
+            #Set novos pontos
+            new_points = []
+            for point in result:
+                new_points.append((point[0],point[1]))
+
+            object.setPoints(new_points)
+            
+            #Redesenha a viewport
+            viewport.draw()
+
         #Cria frame para posicionar na janela.
         rotation_arbitrary_point = Frame(self, width=160, height=120, highlightbackground="black",highlightthickness=1)
         rotation_arbitrary_point.pack_propagate(0)
@@ -230,7 +434,7 @@ class windowTransform(Toplevel):
         #Cria botão para fazer a transformação.
         Button(frame, 
                text='set', 
-               command=lambda: viewport.transformObject(objectName, 'rotation_arbitrary_point', angle=float(angle.get()), x=float(X.get()), y=float(Y.get()))
+               command=lambda: rotation(angle=float(angle.get()), x=float(X.get()), y=float(Y.get()))
                ).grid(column=0, row=3, columnspan=4, pady=5)
         
         return rotation_arbitrary_point
