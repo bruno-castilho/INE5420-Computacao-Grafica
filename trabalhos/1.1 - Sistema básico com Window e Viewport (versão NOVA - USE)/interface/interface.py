@@ -1,6 +1,6 @@
 from tkinter import *
-from components.workspace import Workspace
-from components.menu import Menu
+from interface.interface_components.workspace import Workspace
+from interface.interface_components.menu import Menu
 
 
 class Interface(Tk):

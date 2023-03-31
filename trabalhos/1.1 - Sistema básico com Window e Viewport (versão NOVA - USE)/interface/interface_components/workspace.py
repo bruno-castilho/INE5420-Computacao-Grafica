@@ -1,6 +1,6 @@
 from tkinter import *
-from components.viewport import Viewport
-from components. debug import Debug
+from interface.interface_components.workspace_components.viewport import Viewport
+from interface.interface_components.workspace_components. debug import Debug
 
 
 class Workspace(Frame):

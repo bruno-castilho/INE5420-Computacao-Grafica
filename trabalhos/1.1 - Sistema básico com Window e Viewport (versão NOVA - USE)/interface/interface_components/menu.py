@@ -1,7 +1,7 @@
 from tkinter import * 
-from components.objects import Objects
-from components.zoom import Zoom
-from components.move import Move
+from interface.interface_components.menu_componenets.newobject import NewObject
+from interface.interface_components.menu_componenets.zoom import Zoom
+from interface.interface_components.menu_componenets.move import Move
 
 class Menu(Frame):
     """
@@ -55,7 +55,7 @@ class Menu(Frame):
         self.move.pack(padx=5 ,pady=5)
         
         #Gera frame objects no menu.
-        self.objects = Objects(self)
+        self.objects = NewObject(self)
         self.objects.pack(padx=5, pady=5)
 
     def getInterface(self):

@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import ttk
-from components.windowcreationobject import windowCreationObject
+from interface.interface_components.menu_componenets.windowcreationobject import windowCreationObject
 
-class Objects(Frame):
+class NewObject(Frame):
     """
     ...
         Uma classe para criar um frame Objects.
@@ -48,10 +48,10 @@ class Objects(Frame):
         self.text.pack(pady=(0,5))
         
         #Cria boxlist para escolha do objeto a ser criado.
-        self.object = ttk.Combobox(self, state= "readonly")
-        self.object['values'] = ('point','line', 'wireframe')
-        self.object.current(0)
-        self.object.pack(pady=(0,5))
+        self.objects = ttk.Combobox(self, state= "readonly")
+        self.objects['values'] = ('point','line', 'wireframe')
+        self.objects.current(0)
+        self.objects.pack(pady=(0,5))
 
         #Cria botão 'set' para abrir a janela de criação do objeto escolhido.
         self.btn = Button(self, text='SET', command=self.create)
@@ -67,11 +67,11 @@ class Objects(Frame):
         top = windowCreationObject()
 
         #Define que tipo de objeto será criado
-        if self.object.get() == 'point':
+        if self.objects.get() == 'point':
             top.createPoint(viewport)
-        if self.object.get() == 'line':
+        if self.objects.get() == 'line':
             top.createLine(viewport)
-        if self.object.get() == 'wireframe':
+        if self.objects.get() == 'wireframe':
             top.createWireframe(viewport)
 
         #Inicia janela

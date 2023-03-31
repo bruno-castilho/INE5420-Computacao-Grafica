@@ -1,4 +1,5 @@
 from tkinter import * 
+from globals import *
 
 class Zoom(Frame):
     """
@@ -22,7 +23,15 @@ class Zoom(Frame):
         _btn_zoomOut: Button
             Objeto Button para fazer o Zoom_Out.
 
+    Métodos
+    -------
+        zoomIn(Viewport: viewport) -> None
+            Aumenta o tamanho da window e redesenha objetos na viewport.
+
+        zoomOut(Viewport: viewport) -> None
+            Diminui o tamanho da window e redesenha objetos na viewport.
     """
+    
     def __init__(self, mainframe):
 
         #Set frame zoom
@@ -41,9 +50,23 @@ class Zoom(Frame):
         viewport = workspace.getViewport()
 
         #Cria botão zoomIn
-        self.btn_zoomIn = Button(self, text='+', width=1, height=1, command=viewport.zoomIn)
+        self.btn_zoomIn = Button(self, text='+', width=1, height=1, command=lambda: self.zoomIn(viewport))
         self.btn_zoomIn.grid(column=0,row=1, pady=(0, 5), padx=(5,0), sticky='e')
 
         #Cria botão zoomOut
-        self.btn_zoomOut = Button(self, text='-', width=1, height=1, command=viewport.zoomOut)
+        self.btn_zoomOut = Button(self, text='-', width=1, height=1, command=lambda: self.zoomOut(viewport))
         self.btn_zoomOut.grid(column=1,row=1, pady=(0, 5), padx=(0,5), sticky='w')
+
+    def zoomIn(self, viewport):
+        #Aumenta tamanho da window.
+        window.zomIn()
+        #Redesenha os objetos na viewport.
+        viewport.draw()
+
+    
+    def zoomOut(self, viewport):
+        #Diminui tamanho da window.
+        window.zomOut()
+        #Redesenha os objetos na viewport.
+        viewport.draw()
+
